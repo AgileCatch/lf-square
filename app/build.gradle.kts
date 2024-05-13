@@ -9,8 +9,8 @@ android {
 
     defaultConfig {
         applicationId = "com.focusone.lfsquare"
-        minSdk = 33
-        targetSdk = 34
+        minSdk = 23
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -33,6 +33,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+    }
 }
 
 dependencies {
@@ -45,4 +49,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    //WebView
+    implementation("androidx.webkit:webkit:1.11.0")
+
+    //Permission
+    implementation("io.github.ParkSangGwon:tedpermission-normal:3.3.0")
 }
