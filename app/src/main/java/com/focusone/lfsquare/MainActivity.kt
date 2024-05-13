@@ -18,7 +18,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun initView()= with(binding) {
+    companion object{
+        const val TAG ="MainActivity"
+    }
 
+    private fun initView()= with(binding) {
+//        var baseUrl = BuildConfig.MAIN_URL
+        webView.loadUrl("https://www.lfsquare.co.kr/membership")
+//        Log.d(TAG, "MAIN_URL: ${BuildConfig.MAIN_URL}")
     }
 }
