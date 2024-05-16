@@ -1,18 +1,19 @@
 package com.focusone.lfsquare
 
+import ShakeDetector
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.focusone.lfsquare.databinding.ActivityMainBinding
+import com.focusone.lfsquare.util.BackPressedForFinish
 
 class MainActivity : AppCompatActivity() {
 
-    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private lateinit var backPressedForFinish: BackPressedForFinish
+    private lateinit var mWebView: BaseWebView
+    private lateinit var shakeDetector: ShakeDetector
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -21,6 +22,15 @@ class MainActivity : AppCompatActivity() {
 
         initView()
 
+        shakeDetector = ShakeDetector(this) {
+            showBarcodePopup()
+        }
+
+    }
+
+    private fun showBarcodePopup() {
+        val jsCode = "$('.layerpop').show();"
+        binding.webView.evaluateJavascript(jsCode, null)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean = with(binding) {
@@ -49,9 +59,16 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun getBackPressedClass(): BackPressedForFinish {
+        private fun getBackPressedClass(): BackPressedForFinish {
         return backPressedForFinish
     }
+
+//    val mBarcodeLauncher = registerForActivityResult() { result: ScanIntentResult? ->
+//        Log.e(TAG, "Barcode Scanner Callback is called with result: $result")
+//        val jsCode = "$('.layerpop').show();"
+//
+//    }
+
 
     private fun initView()= with(binding) {
 //        var baseUrl = BuildConfig.MAIN_URL
@@ -61,5 +78,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object{
         const val TAG ="MainActivity"
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        shakeDetector.unregisterListener()
     }
 }
