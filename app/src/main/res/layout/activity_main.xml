@@ -13,7 +13,73 @@
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottom_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="@+id/web_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@color/white"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="20dp"
+            android:text="뒤로"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/bottom_app_bar"
+            app:layout_constraintTop_toTopOf="@+id/bottom_app_bar" />
+
+        <Button
+            android:id="@+id/btn_forward"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="30dp"
+            android:text="앞으로"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_back"
+            app:layout_constraintStart_toEndOf="@+id/btn_back"
+            app:layout_constraintTop_toTopOf="@+id/btn_back" />
+
+
+        <Button
+            android:id="@+id/btn_refresh"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="30dp"
+            android:text="새로고침"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_home"
+            app:layout_constraintTop_toTopOf="@+id/bottom_app_bar" />
+
+        <Button
+            android:id="@+id/btn_home"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="20dp"
+            android:text="home"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_refresh"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/btn_refresh" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_barcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/black"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
