@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                 webView.goBack()
 //                showProgressBar()
             }else{
-                showToast(this@MainActivity, R.string.toast_no_back)
+                showToast(this@MainActivity, R.string.no_page_to_load)
 //                hideProgressBar()
             }
         }
@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
                 webView.goForward()
 //                showProgressBar()
             } else {
-                showToast(this@MainActivity,R.string.toast_no_forward)
+                showToast(this@MainActivity,R.string.no_page_to_load)
                 Log.d(TAG, "No next page to go forward to")
 //                hideProgressBar()
             }

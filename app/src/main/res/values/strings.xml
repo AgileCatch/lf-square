@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">LF SQUARE</string>
-    <string name="toast_no_back">뒤로 갈 페이지가 없습니다.</string>
-    <string name="toast_no_forward">앞으로 갈 페이지가 없습니다.</string>
+    <string name="no_page_to_load">이동 할 페이지가 없습니다.</string>
 
 </resources>
