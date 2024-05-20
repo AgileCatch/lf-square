@@ -1,17 +1,19 @@
 package com.focusone.lfsquare
 
 import ShakeDetector
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
 import android.view.ViewTreeObserver
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.focusone.lfsquare.databinding.ActivityMainBinding
 import com.focusone.lfsquare.util.BackPressedForFinish
 
 class MainActivity : AppCompatActivity() {
 
-    val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private lateinit var backPressedForFinish: BackPressedForFinish
     private lateinit var shakeDetector: ShakeDetector
 
@@ -84,6 +86,8 @@ class MainActivity : AppCompatActivity() {
         btnBack.setOnClickListener {
             if (webView.canGoBack()) {
                 webView.goBack()
+            }else{
+                showToast(this@MainActivity, R.string.toast_no_back)
             }
         }
 
@@ -92,6 +96,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "Moving forward")
                 webView.goForward()
             } else {
+                showToast(this@MainActivity,R.string.toast_no_forward)
                 Log.d(TAG, "No next page to go forward to")
             }
         }
@@ -135,11 +140,11 @@ class MainActivity : AppCompatActivity() {
     private fun hideBottomAppBar() = with(binding) {
         apply {
             bottomAppBar.animate()
-                .translationY(binding.bottomAppBar.height.toFloat())
+                .translationY(bottomAppBar.height.toFloat())
                 .setDuration(300)
                 .start()
             btnBarcode.animate()
-                .translationY(binding.bottomAppBar.height.toFloat())
+                .translationY(bottomAppBar.height.toFloat())
                 .setDuration(300)
                 .start()
         }
@@ -156,6 +161,10 @@ class MainActivity : AppCompatActivity() {
                 .setDuration(300)
                 .start()
         }
+    }
+
+    fun showToast(context: Context, message: Int, duration: Int = Toast.LENGTH_SHORT) {
+        Toast.makeText(context, message, duration).show()
     }
 
     override fun onDestroy() {
