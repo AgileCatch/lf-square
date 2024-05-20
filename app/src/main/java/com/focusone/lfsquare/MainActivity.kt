@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
+import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -13,7 +14,7 @@ import com.focusone.lfsquare.util.BackPressedForFinish
 
 class MainActivity : AppCompatActivity() {
 
-    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private lateinit var binding: ActivityMainBinding // ActivityMainBinding을 지연 초기화합니다.
     private lateinit var backPressedForFinish: BackPressedForFinish
     private lateinit var shakeDetector: ShakeDetector
 
@@ -24,18 +25,23 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val webView= binding.webView
+        webView.setActivity(this)
 
         backPressedForFinish = BackPressedForFinish(this)
 
+
         initView()
-        //바코드 세이크시 팝업
+        //쉐이크 하면 바코드 팝업
         shakeDetector = ShakeDetector(this) {
             showBarcodePopup()
         }
         //버튼 셋업
         setupButtons()
-        //바텀앱바 셋업
+        //bottom app bar 셋업
         setupScrollListener()
     }
 
@@ -86,8 +92,10 @@ class MainActivity : AppCompatActivity() {
         btnBack.setOnClickListener {
             if (webView.canGoBack()) {
                 webView.goBack()
+//                showProgressBar()
             }else{
                 showToast(this@MainActivity, R.string.toast_no_back)
+//                hideProgressBar()
             }
         }
 
@@ -95,9 +103,11 @@ class MainActivity : AppCompatActivity() {
             if (webView.canGoForward()) {
                 Log.d(TAG, "Moving forward")
                 webView.goForward()
+//                showProgressBar()
             } else {
                 showToast(this@MainActivity,R.string.toast_no_forward)
                 Log.d(TAG, "No next page to go forward to")
+//                hideProgressBar()
             }
         }
 
@@ -163,7 +173,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun showToast(context: Context, message: Int, duration: Int = Toast.LENGTH_SHORT) {
+    fun showProgressBar()= with(binding) {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    fun hideProgressBar()= with(binding) {
+        progressBar.visibility = View.GONE
+    }
+
+    private fun showToast(context: Context, message: Int, duration: Int = Toast.LENGTH_SHORT) {
         Toast.makeText(context, message, duration).show()
     }
 
