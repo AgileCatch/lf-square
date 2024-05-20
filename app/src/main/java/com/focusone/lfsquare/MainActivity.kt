@@ -14,6 +14,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var backPressedForFinish: BackPressedForFinish
     private lateinit var mWebView: BaseWebView
     private lateinit var shakeDetector: ShakeDetector
+
+    companion object {
+        const val TAG = "MainActivity"
+        const val MAIN_URL= BuildConfig.MAIN_URL
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -26,11 +32,6 @@ class MainActivity : AppCompatActivity() {
             showBarcodePopup()
         }
 
-    }
-
-    private fun showBarcodePopup() {
-        val jsCode = "$('.layerpop').show();"
-        binding.webView.evaluateJavascript(jsCode, null)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean = with(binding) {
@@ -59,26 +60,20 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-        private fun getBackPressedClass(): BackPressedForFinish {
+    private fun getBackPressedClass(): BackPressedForFinish {
         return backPressedForFinish
     }
 
-//    val mBarcodeLauncher = registerForActivityResult() { result: ScanIntentResult? ->
-//        Log.e(TAG, "Barcode Scanner Callback is called with result: $result")
-//        val jsCode = "$('.layerpop').show();"
-//
-//    }
-
-
-    private fun initView()= with(binding) {
-//        var baseUrl = BuildConfig.MAIN_URL
-        webView.loadUrl("https://www.lfsquare.co.kr/membership")
-//        Log.d(TAG, "MAIN_URL: ${BuildConfig.MAIN_URL}")
+    private fun initView() = with(binding) {
+        webView.loadUrl(MAIN_URL)
+        Log.d(TAG, "baseUrl: ${BuildConfig.MAIN_URL}")
     }
 
-    companion object{
-        const val TAG ="MainActivity"
+    private fun showBarcodePopup() {
+        val jsCodeBarcodePopup = "$('.layerpop').show();"
+        binding.webView.evaluateJavascript(jsCodeBarcodePopup, null)
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
