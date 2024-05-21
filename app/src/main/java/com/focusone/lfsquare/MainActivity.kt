@@ -14,9 +14,10 @@ import com.focusone.lfsquare.util.BackPressedForFinish
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding // ActivityMainBinding을 지연 초기화합니다.
+    lateinit var binding: ActivityMainBinding // ActivityMainBinding을 지연 초기화합니다.
     private lateinit var backPressedForFinish: BackPressedForFinish
     private lateinit var shakeDetector: ShakeDetector
+
 
     companion object {
         const val TAG = "MainActivity"
@@ -28,8 +29,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val webView= binding.webView
-        webView.setActivity(this)
+        val mainWebView = binding.mainWebView
+        val subWebView = binding.subWebView
+
+        mainWebView.setActivity(this)
+        mainWebView.setSubWebView(subWebView)
+
 
         backPressedForFinish = BackPressedForFinish(this)
 
@@ -47,23 +52,23 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean = with(binding) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
-            val msg = ">>>>> canGoBack: [${webView.url}]"
+        if (keyCode == KeyEvent.KEYCODE_BACK && mainWebView.canGoBack()) {
+            val msg = ">>>>> canGoBack: [${mainWebView.url}]"
             Log.e(TAG, msg)
             val nIndex = 2
-            val historyList = webView.copyBackForwardList()
+            val historyList = mainWebView.copyBackForwardList()
             var mallMainUrl = ""
             val webHistoryItem = historyList.getItemAtIndex(nIndex)
             if (webHistoryItem != null) {
                 mallMainUrl = webHistoryItem.url
             }
-            if (webView.url.equals(mallMainUrl, ignoreCase = true)) {
+            if (mainWebView.url.equals(mallMainUrl, ignoreCase = true)) {
                 val backBtn: BackPressedForFinish = getBackPressedClass()
                 backBtn.onBackPressed()
             } else {
-                webView.goBack() // 뒤로가기
+                mainWebView.goBack() // 뒤로가기
             }
-        } else if (keyCode == KeyEvent.KEYCODE_BACK && !webView.canGoBack()) {
+        } else if (keyCode == KeyEvent.KEYCODE_BACK && !mainWebView.canGoBack()) {
             val backBtn: BackPressedForFinish = getBackPressedClass()
             backBtn.onBackPressed()
         } else {
@@ -77,46 +82,40 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initView() = with(binding) {
-        webView.loadUrl(MAIN_URL)
+        mainWebView.loadUrl(MAIN_URL)
         Log.d(TAG, "baseUrl: ${BuildConfig.MAIN_URL}")
-
-
     }
 
     private fun showBarcodePopup() {
         val jsCodeBarcodePopup = "$('.layerpop').show();"
-        binding.webView.evaluateJavascript(jsCodeBarcodePopup, null)
+        binding.mainWebView.evaluateJavascript(jsCodeBarcodePopup, null)
     }
 
     private fun setupButtons() = with(binding) {
         btnBack.setOnClickListener {
-            if (webView.canGoBack()) {
-                webView.goBack()
-//                showProgressBar()
-            }else{
+            if (mainWebView.canGoBack()) {
+                mainWebView.goBack()
+            } else {
                 showToast(this@MainActivity, R.string.no_page_to_load)
-//                hideProgressBar()
             }
         }
 
         btnForward.setOnClickListener {
-            if (webView.canGoForward()) {
+            if (mainWebView.canGoForward()) {
                 Log.d(TAG, "Moving forward")
-                webView.goForward()
-//                showProgressBar()
+                mainWebView.goForward()
             } else {
-                showToast(this@MainActivity,R.string.no_page_to_load)
+                showToast(this@MainActivity, R.string.no_page_to_load)
                 Log.d(TAG, "No next page to go forward to")
-//                hideProgressBar()
             }
         }
 
         btnRefresh.setOnClickListener {
-            webView.reload()
+            mainWebView.reload()
         }
 
         btnHome.setOnClickListener {
-            webView.loadUrl(MAIN_URL)
+            mainWebView.loadUrl(MAIN_URL)
         }
 
         btnBarcode.setOnClickListener {
@@ -125,13 +124,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupScrollListener() = with(binding) {
-        webView.viewTreeObserver.addOnScrollChangedListener(object :
+        mainWebView.viewTreeObserver.addOnScrollChangedListener(object :
             ViewTreeObserver.OnScrollChangedListener {
             private var lastScrollY = 0
             private var lastScrollDirection = 0 // 1: up, -1: down
 
             override fun onScrollChanged() {
-                val currentScrollY = webView.scrollY
+                val currentScrollY = mainWebView.scrollY
                 val scrollDelta = currentScrollY - lastScrollY
 
                 if (scrollDelta > 0 && lastScrollDirection != -1) {
@@ -173,11 +172,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun showProgressBar()= with(binding) {
+    fun showProgressBar() = with(binding) {
         progressBar.visibility = View.VISIBLE
     }
 
-    fun hideProgressBar()= with(binding) {
+    fun hideProgressBar() = with(binding) {
         progressBar.visibility = View.GONE
     }
 
