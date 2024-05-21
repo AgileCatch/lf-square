@@ -310,19 +310,28 @@ class BaseWebView : WebView {
             isUserGesture: Boolean,
             resultMsg: Message
         ): Boolean {
+            activity.binding.subWebViewContainer.removeAllViews()
 
             // 새 WebView 인스턴스 생성
             val newWebView = WebView(view.context)
 
             // 새로운 WebView 설정
-            subWebViewInstance.apply {
-                visibility = View.VISIBLE
-                addView(newWebView)
+            newWebView.apply {
+                webViewClient = MyWebViewClient()
+                webChromeClient = this@MyWebChromeClient
                 settings.apply {
                     javaScriptEnabled = true
                     javaScriptCanOpenWindowsAutomatically = true
-                    setSupportMultipleWindows(true)
+                    setSupportMultipleWindows(false) //멀티윈도우를 지원할지 여부
+
                 }
+            }
+
+            // 새 WebView를 subWebViewInstance에 추가
+            subWebViewInstance = newWebView
+            activity.binding.subWebViewContainer.apply {
+                visibility = View.VISIBLE
+                addView(newWebView)
             }
 
             // WebViewTransport를 사용하여 새 WebView 전달
@@ -335,9 +344,12 @@ class BaseWebView : WebView {
 
         override fun onCloseWindow(window: WebView) {
             super.onCloseWindow(window)
-            // Hide the subWebView
-            subWebViewInstance.visibility = View.GONE
-            subWebViewInstance.loadUrl("about:blank")
+            // 서브 웹뷰 숨기기
+            activity.binding.subWebViewContainer.apply {
+                visibility = View.GONE
+                removeView(window)
+                window.destroy()
+            }
         }
 
         //웹뷰 alert 네이티브 팝업처리

@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
         mainWebView.setActivity(this)
         mainWebView.setSubWebView(subWebView)
 
-
         backPressedForFinish = BackPressedForFinish(this)
 
 
@@ -52,30 +51,44 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean = with(binding) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && mainWebView.canGoBack()) {
-            val msg = ">>>>> canGoBack: [${mainWebView.url}]"
-            Log.e(TAG, msg)
-            val nIndex = 2
-            val historyList = mainWebView.copyBackForwardList()
-            var mallMainUrl = ""
-            val webHistoryItem = historyList.getItemAtIndex(nIndex)
-            if (webHistoryItem != null) {
-                mallMainUrl = webHistoryItem.url
+        when {
+            // 서브 웹뷰가 보이는 경우
+            keyCode == KeyEvent.KEYCODE_BACK && subWebViewContainer.visibility == View.VISIBLE -> {
+                if (subWebView.canGoBack()) {
+                    subWebView.goBack()// 서브 웹뷰에서 뒤로 가기
+                } else {
+                    hideSubWebView() // 서브 웹뷰 숨기기
+                }
             }
-            if (mainWebView.url.equals(mallMainUrl, ignoreCase = true)) {
+            // 메인 웹뷰가 뒤로 갈 수 있는 경우
+            keyCode == KeyEvent.KEYCODE_BACK && mainWebView.canGoBack() -> {
+                val msg = ">>>>> canGoBack: [${mainWebView.url}]"
+                Log.e(TAG, msg)
+                val nIndex = 2
+                val historyList = mainWebView.copyBackForwardList()
+                var mallMainUrl = ""
+                val webHistoryItem = historyList.getItemAtIndex(nIndex)
+                if (webHistoryItem != null) {
+                    mallMainUrl = webHistoryItem.url
+                }
+                if (mainWebView.url.equals(mallMainUrl, ignoreCase = true)) {
+                    val backBtn: BackPressedForFinish = getBackPressedClass()
+                    backBtn.onBackPressed()
+                } else {
+                    mainWebView.goBack() // 메인 웹뷰에서 뒤로 가기
+                }
+            }
+            // 메인 웹뷰가 뒤로 갈 수 없는 경우
+            keyCode == KeyEvent.KEYCODE_BACK && !mainWebView.canGoBack() -> {
                 val backBtn: BackPressedForFinish = getBackPressedClass()
                 backBtn.onBackPressed()
-            } else {
-                mainWebView.goBack() // 뒤로가기
             }
-        } else if (keyCode == KeyEvent.KEYCODE_BACK && !mainWebView.canGoBack()) {
-            val backBtn: BackPressedForFinish = getBackPressedClass()
-            backBtn.onBackPressed()
-        } else {
-            return super.onKeyDown(keyCode, event)
+            // 다른 경우
+            else -> return super.onKeyDown(keyCode, event)
         }
         return true
     }
+
 
     private fun getBackPressedClass(): BackPressedForFinish {
         return backPressedForFinish
@@ -180,6 +193,17 @@ class MainActivity : AppCompatActivity() {
         progressBar.visibility = View.GONE
     }
 
+    private fun showSubWebView() = with(binding) {
+        subWebViewContainer.visibility = View.VISIBLE
+        mainWebView.visibility = View.GONE
+    }
+
+    private fun hideSubWebView() = with(binding) {
+        subWebViewContainer.visibility = View.GONE
+        mainWebView.visibility = View.VISIBLE
+    }
+
+
     private fun showToast(context: Context, message: Int, duration: Int = Toast.LENGTH_SHORT) {
         Toast.makeText(context, message, duration).show()
     }
@@ -187,5 +211,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         shakeDetector.unregisterListener()
+
     }
 }

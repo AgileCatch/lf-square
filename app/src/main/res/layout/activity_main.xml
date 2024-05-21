@@ -18,11 +18,17 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
-    <WebView
-        android:id="@+id/sub_web_view"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/sub_web_view_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:visibility="gone">
+        <WebView
+            android:id="@+id/sub_web_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_app_bar"
