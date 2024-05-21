@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         shakeDetector = ShakeDetector(this) {
             showBarcodePopup()
         }
-        //버튼 셋업
+        //btn 셋업
         setupButtons()
         //bottom app bar 셋업
         setupScrollListener()
