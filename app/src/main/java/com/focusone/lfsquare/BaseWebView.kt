@@ -116,184 +116,137 @@ class BaseWebView : WebView {
             Log.e(TAG, "shouldOverrideUrlLoading : " + request.url.toString())
             val url = request.url.toString()
             return try {
-                if (url.startsWith("about:blank")) {
-                    Log.e(TAG, "about:blank")
-                    true
-                } else if (url.startsWith("tel:")) {
-                    val intent = Intent(Intent.ACTION_DIAL, Uri.parse(url))
-                    mContext!!.startActivity(intent)
-                    true
-                } else if (url.startsWith("mailto:")) {
-                    val eMail = url.replace("mailto", "")
-                    val intent = Intent(Intent.ACTION_SEND)
-                    intent.setType("plain/text")
-                    intent.putExtra(Intent.EXTRA_EMAIL, eMail)
-                    mContext!!.startActivity(intent)
-                    true
-                } else if (url.startsWith("intent:kakao") || url.startsWith("kakao")) {
-                    try {
-                        val intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
-                        val existPackage = mContext!!.packageManager.getLaunchIntentForPackage(
-                            intent.getPackage()!!
-                        )
-                        if (existPackage != null) {
-                            mContext!!.startActivity(intent)
+                when {
+                    url.startsWith("about:blank") -> {
+                        Log.e(TAG, "about:blank")
+                        true
+                    }
+                    url.startsWith("tel:") -> {
+                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse(url))
+                        mContext!!.startActivity(intent)
+                        true
+                    }
+                    url.startsWith("mailto:") -> {
+                        val eMail = url.replace("mailto", "")
+                        val intent = Intent(Intent.ACTION_SEND)
+                        intent.setType("plain/text")
+                        intent.putExtra(Intent.EXTRA_EMAIL, eMail)
+                        mContext!!.startActivity(intent)
+                        true
+                    }
+                    url.startsWith("https://maps.google.com") -> {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        mContext!!.startActivity(intent)
+                        true
+                    }
+                    url.startsWith("intent:kakao") || url.startsWith("kakao") -> {
+                        try {
+                            val intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
+                            val existPackage = mContext!!.packageManager.getLaunchIntentForPackage(
+                                intent.getPackage()!!
+                            )
+                            if (existPackage != null) {
+                                mContext!!.startActivity(intent)
+                            } else {
+                                val marketIntent = Intent(Intent.ACTION_VIEW)
+                                marketIntent.setData(Uri.parse("market://details?id=" + intent.getPackage()))
+                                mContext!!.startActivity(marketIntent)
+                            }
+                        } catch (e: Exception) {
+                            Log.d(TAG, "Bad URI " + url + ":" + e.message)
+                            return false
+                        }
+                        true
+                    }
+                    !url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("javascript:") -> {
+                        Log.d(TAG, "Exception1: $url")
+                        var intent: Intent? = null
+                        intent = try {
+                            // 딥링크 스키마 확인
+                            Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
+                        } catch (ex: URISyntaxException) {
+                            Log.e(TAG, "[error] Bad request uri format : [" + url + "] =" + ex.message)
+                            return false
+                        }
+                        if (intent != null && mContext!!.packageManager.resolveActivity(intent, 0) == null) {
+                            Log.d(TAG, "shouldOverrideUrlLoading: $url")
+                            val pkgName = intent.getPackage()
+                            if (pkgName != null) {
+                                val uri = Uri.parse("market://search?q=pname:$pkgName")
+                                intent = Intent(Intent.ACTION_VIEW, uri)
+                                mContext!!.startActivity(intent)
+                            }
                         } else {
-                            val marketIntent = Intent(Intent.ACTION_VIEW)
-                            marketIntent.setData(Uri.parse("market://details?id=" + intent.getPackage()))
-                            mContext!!.startActivity(marketIntent)
+                            val uri = Uri.parse(intent?.dataString)
+                            val intent = Intent(Intent.ACTION_VIEW, uri)
+                            mContext?.startActivity(intent)
                         }
-                    } catch (e: Exception) {
-                        Log.d(TAG, "Bad URI " + url + ":" + e.message)
-                        return false
+                        true
                     }
-                    true
-                } else if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith(
-                        "javascript:"
-                    )
-                ) {
-                    Log.d(TAG, "Exception1: $url")
-                    var intent: Intent? = null
-                    intent = try {
-                        // 딥링크 스키마 확인
-                        Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
-
-                        // for test
-                        //WebSettings settings2 = getSettings();
-                        //QLog.e(TAG, ">>>>> UserAgent : " + settings2.getUserAgentString());
-                    } catch (ex: URISyntaxException) {
-                        Log.e(TAG, "[error] Bad request uri format : [" + url + "] =" + ex.message)
-                        return false
+                    else -> {
+                        // 새로운 웹뷰를 생성하여 로드
+                        val subWebView = findViewById<WebView>(R.id.sub_web_view)
+                        Log.e(TAG, "subWebView : [$url]")
+                        subWebView.visibility = View.VISIBLE
+                        subWebView.loadUrl(url)
+                        true
                     }
-                    if (intent != null && mContext!!.packageManager.resolveActivity(
-                            intent,
-                            0
-                        ) == null
-                    ) { // 폰에 앱 미설치 된 경우
-                        Log.d(TAG, "shouldOverrideUrlLoading: $url")
-                        val pkgName = intent.getPackage()
-                        if (pkgName != null) {
-                            val uri = Uri.parse("market://search?q=pname:$pkgName")
-                            intent = Intent(Intent.ACTION_VIEW, uri)
-                            mContext!!.startActivity(intent)
-                        }
-                    } else { // 폰에 앱 설치된 경우
-                        val uri = Uri.parse(intent?.dataString)
-                        val intent = Intent(Intent.ACTION_VIEW, uri)
-                        mContext?.startActivity(intent)
-                    }
-                    true
-                } else {
-                    // 새로운 웹뷰를 생성하여 로드
-                    val subWebView = findViewById<WebView>(R.id.sub_web_view)
-                    Log.e(TAG, "subWebView : [" + url + "]")
-                    subWebView.visibility = View.VISIBLE
-                    subWebView.loadUrl(url)
-                    true
                 }
-                //[END INICISPAY PG사 코드] /////////////////////////////////////////////////////////
             } catch (e: Exception) {
                 Log.d(TAG, "Exception: $url")
                 false
             }
         }
 
-
         override fun doUpdateVisitedHistory(view: WebView?, url: String, isReload: Boolean) {
             Log.d(TAG, "doUpdateVisitedHistory : $url")
         }
 
-        //페이지 로딩 시작
+        // 페이지 로딩 시작
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
             Log.e(TAG, "onPageStarted URL : $url")
             activity.showProgressBar()
         }
 
-        //오류 처리
+        // 오류 처리
         @Deprecated("Deprecated in Java")
-        override fun onReceivedError(
-            view: WebView,
-            errorCode: Int,
-            description: String,
-            failingUrl: String
-        ) {
+        override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
             super.onReceivedError(view, errorCode, description, failingUrl)
             Log.e(TAG, "onReceivedError : $failingUrl")
-
-            when (errorCode) {
-                ERROR_AUTHENTICATION -> {
-                    Log.e(TAG, "onReceivedError : 서버에서 사용자 인증 실패")
-                }
-
-                ERROR_BAD_URL -> {
-                    Log.e(TAG, "onReceivedError : 잘못된 URL")
-                }
-
-                ERROR_CONNECT -> {
-                    Log.e(TAG, "onReceivedError : 서버로 연결 실패")
-                }
-
-                ERROR_FAILED_SSL_HANDSHAKE -> {
-                    Log.e(TAG, "onReceivedError : SSL handshake 수행 실패")
-                }
-
-                ERROR_FILE -> {
-                    Log.e(TAG, "onReceivedError : 일반 파일 오류")
-                }
-
-                ERROR_FILE_NOT_FOUND -> {
-                    Log.e(TAG, "onReceivedError : 파일을 찾을 수 없습니다")
-                }
-
-                ERROR_HOST_LOOKUP -> {
-                    Log.e(TAG, "onReceivedError : 서버 또는 프록시 호스트 이름 조회 실패")
-                }
-
-                ERROR_IO -> {
-                    Log.e(TAG, "onReceivedError : 서버에서 읽거나 서버로 쓰기 실패")
-                }
-
-                ERROR_PROXY_AUTHENTICATION -> {
-                    Log.e(TAG, "onReceivedError : 프록시에서 사용자 인증 실패")
-                }
-
-                ERROR_REDIRECT_LOOP -> {
-                    Log.e(TAG, "onReceivedError : 너무 많은 리디렉션")
-                }
-
-                ERROR_TIMEOUT -> {
-                    Log.e(TAG, "onReceivedError : 연결 시간 초과")
-                }
-
-                ERROR_TOO_MANY_REQUESTS -> {
-                    Log.e(TAG, "onReceivedError : 페이지 로드중 너무 많은 요청 발생")
-                }
-
-                ERROR_UNKNOWN -> {
-                    Log.e(TAG, "onReceivedError : 일반 오류")
-                }
-
-                ERROR_UNSUPPORTED_AUTH_SCHEME -> {
-                    Log.e(TAG, "onReceivedError : 지원되지 않는 인증 체계")
-                }
-
-                ERROR_UNSUPPORTED_SCHEME -> {
-                    Log.e(TAG, "onReceivedError : URI가 지원되지 않는 방식")
-                }
-            }
+            handleError(errorCode)
         }
 
-        //페이지 로딩 완료
+        // 페이지 로딩 완료
         override fun onPageFinished(view: WebView, url: String) {
             super.onPageFinished(view, url)
             Log.e(TAG, "onPageFinished : $url")
             activity.hideProgressBar()
-            //[1] 앱 최초 기동 유무를 확인 -> MainActivity. stopAnimation() 에서 처리
             // 웹뷰의 RAM과 영구 저장소 사이에 쿠키 강제 동기화 수행 함.
             CookieManager.getInstance().flush()
         }
+
+        private fun handleError(errorCode: Int) {
+            when (errorCode) {
+                ERROR_AUTHENTICATION -> Log.e(TAG, "onReceivedError : 서버에서 사용자 인증 실패")
+                ERROR_BAD_URL -> Log.e(TAG, "onReceivedError : 잘못된 URL")
+                ERROR_CONNECT -> Log.e(TAG, "onReceivedError : 서버로 연결 실패")
+                ERROR_FAILED_SSL_HANDSHAKE -> Log.e(TAG, "onReceivedError : SSL handshake 수행 실패")
+                ERROR_FILE -> Log.e(TAG, "onReceivedError : 일반 파일 오류")
+                ERROR_FILE_NOT_FOUND -> Log.e(TAG, "onReceivedError : 파일을 찾을 수 없습니다")
+                ERROR_HOST_LOOKUP -> Log.e(TAG, "onReceivedError : 서버 또는 프록시 호스트 이름 조회 실패")
+                ERROR_IO -> Log.e(TAG, "onReceivedError : 서버에서 읽거나 서버로 쓰기 실패")
+                ERROR_PROXY_AUTHENTICATION -> Log.e(TAG, "onReceivedError : 프록시에서 사용자 인증 실패")
+                ERROR_REDIRECT_LOOP -> Log.e(TAG, "onReceivedError : 너무 많은 리디렉션")
+                ERROR_TIMEOUT -> Log.e(TAG, "onReceivedError : 연결 시간 초과")
+                ERROR_TOO_MANY_REQUESTS -> Log.e(TAG, "onReceivedError : 페이지 로드중 너무 많은 요청 발생")
+                ERROR_UNKNOWN -> Log.e(TAG, "onReceivedError : 일반 오류")
+                ERROR_UNSUPPORTED_AUTH_SCHEME -> Log.e(TAG, "onReceivedError : 지원되지 않는 인증 체계")
+                ERROR_UNSUPPORTED_SCHEME -> Log.e(TAG, "onReceivedError : URI가 지원되지 않는 방식")
+            }
+        }
     }
+
 
     private inner class MyWebChromeClient : WebChromeClient() {
         // webview에 있는 inline 동영상 player가 영상을  load 할 때, 보이는
@@ -323,6 +276,8 @@ class BaseWebView : WebView {
                     javaScriptEnabled = true
                     javaScriptCanOpenWindowsAutomatically = true
                     setSupportMultipleWindows(false) //멀티윈도우를 지원할지 여부
+                    useWideViewPort = true  // 화면 사이즈 맞추기 허용 여부
+
 
                 }
             }
@@ -416,7 +371,6 @@ class BaseWebView : WebView {
                 // 예를 들어, 새로운 WebView를 열거나 다른 액션을 취할 수 있습니다.
             }
         }
-
 
     }
 }
