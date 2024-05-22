@@ -1,4 +1,4 @@
-package com.focusone.lfsquare
+package com.app.uxis.lf
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

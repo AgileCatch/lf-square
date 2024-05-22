@@ -1,4 +1,4 @@
-package com.focusone.lfsquare.util
+package com.app.uxis.lf.util
 
 import android.app.Activity
 import android.widget.Toast

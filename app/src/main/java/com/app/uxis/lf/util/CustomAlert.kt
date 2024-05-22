@@ -1,4 +1,4 @@
-package com.focusone.lfsquare.util
+package com.app.uxis.lf.util
 
 //noinspection SuspiciousImport
 import android.R

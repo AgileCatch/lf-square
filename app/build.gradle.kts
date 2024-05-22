@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.focusone.lfsquare"
+    namespace = "com.app.uxis.lf"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.focusone.lfsquare"
+        applicationId = "com.app.uxis.lf"
         minSdk = 23
         targetSdk = 33
         versionCode = 1

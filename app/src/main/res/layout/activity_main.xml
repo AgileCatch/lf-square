@@ -5,9 +5,9 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context="com.app.uxis.lf.MainActivity">
 
-    <com.focusone.lfsquare.BaseWebView
+    <com.app.uxis.lf.BaseWebView
         android:id="@+id/main_web_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

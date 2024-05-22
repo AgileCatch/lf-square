@@ -39,7 +39,7 @@
         android:theme="@style/Theme.LFSQUARE"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name="com.app.uxis.lf.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait">
 

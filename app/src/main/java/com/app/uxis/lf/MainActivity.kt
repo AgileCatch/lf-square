@@ -1,4 +1,4 @@
-package com.focusone.lfsquare
+package com.app.uxis.lf
 
 import ShakeDetector
 import android.content.Context
@@ -9,8 +9,8 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.focusone.lfsquare.databinding.ActivityMainBinding
-import com.focusone.lfsquare.util.BackPressedForFinish
+import com.app.uxis.lf.databinding.ActivityMainBinding
+import com.app.uxis.lf.util.BackPressedForFinish
 
 class MainActivity : AppCompatActivity() {
 

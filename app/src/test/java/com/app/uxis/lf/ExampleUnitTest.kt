@@ -1,4 +1,4 @@
-package com.focusone.lfsquare
+package com.app.uxis.lf
 
 import org.junit.Test
 

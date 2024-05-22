@@ -1,4 +1,4 @@
-package com.focusone.lfsquare
+package com.app.uxis.lf
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -19,7 +19,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.focusone.lfsquare.util.CustomAlert
+import com.app.uxis.lf.BuildConfig
+import com.app.uxis.lf.util.CustomAlert
 import java.net.URISyntaxException
 
 
@@ -44,7 +45,7 @@ class BaseWebView : WebView {
     }
 
     fun setActivity(activity: MainActivity) {
-        BaseWebView.activity = activity
+        Companion.activity = activity
     }
 
     fun setSubWebView(subWebView: WebView) {
