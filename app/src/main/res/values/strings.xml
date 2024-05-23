@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">LF SQUARE</string>
-    <string name="no_page_to_load">이동 할 페이지가 없습니다.</string>
-    <string name="string_common_notification_alert">"설정 > 어플리케이션 > LF스퀘어 > 권한" 에서 알림 접근 권한을 수락해 주세요.</string>
-
-</resources>
