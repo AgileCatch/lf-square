@@ -1,16 +1,25 @@
 package com.app.uxis.lf
 
 import ShakeDetector
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.app.uxis.lf.databinding.ActivityMainBinding
 import com.app.uxis.lf.util.BackPressedForFinish
+import com.google.firebase.messaging.FirebaseMessaging
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.normal.TedPermission
+import com.gun0912.tedpermission.provider.TedPermissionProvider
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,8 +31,11 @@ class MainActivity : AppCompatActivity() {
     companion object {
         const val TAG = "MainActivity"
         const val MAIN_URL = BuildConfig.MAIN_URL
+        private const val REQUEST_CODE_NOTIFICATION = 2000
+
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -39,6 +51,7 @@ class MainActivity : AppCompatActivity() {
 
 
         initView()
+        initFireBase()
         //쉐이크 하면 바코드 팝업
         shakeDetector = ShakeDetector(this) {
             showBarcodePopup()
@@ -46,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         //btn 셋업
         setupButtons()
         //bottom app bar 셋업
-        setupScrollListener()
+//        setupScrollListener()
     }
 
 
@@ -89,6 +102,51 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun initFireBase() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                // 여기서 token을 이용하여 작업을 수행할 수 있습니다.
+                // 예를 들어, 토스트 메시지로 토큰을 표시할 수 있습니다.
+                token?.let {
+                    tedShowToast("토큰: $it")
+                    Log.e(TAG, "토큰 값: $it")
+
+                }
+                permissionNotification()//알림권한요청
+            } else {
+                // 토큰을 가져오는 데 실패한 경우
+                tedShowToast("토큰을 가져오는 데 실패했습니다.")
+            }
+        }
+    }
+
+    //     알림 접근 권한
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun permissionNotification() {
+        TedPermission.create()
+            .setDeniedMessage(R.string.string_common_notification_alert)
+            .setPermissions(Manifest.permission.POST_NOTIFICATIONS)
+            .setPermissionListener(object : PermissionListener {
+                @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+                override fun onPermissionGranted() {
+                    //이미 권한이 있거나 사용자가 권한을 허용했을 때 호출
+                    if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(
+                            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                            REQUEST_CODE_NOTIFICATION
+                        )
+                    }
+                }
+
+                override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                    //요청이 거부 되었을 때 호출
+                }
+            }).check()
+
+    }
+
 
     private fun getBackPressedClass(): BackPressedForFinish {
         return backPressedForFinish
@@ -105,6 +163,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() = with(binding) {
+        btnBarcode.setBackgroundDrawable(ContextCompat.getDrawable(this@MainActivity,R.drawable.ic_open_barcode))
         btnBack.setOnClickListener {
             if (mainWebView.canGoBack()) {
                 mainWebView.goBack()
@@ -136,7 +195,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //바텀 앱바 스크롤
     private fun setupScrollListener() = with(binding) {
+
         mainWebView.viewTreeObserver.addOnScrollChangedListener(object :
             ViewTreeObserver.OnScrollChangedListener {
             private var lastScrollY = 0
@@ -206,6 +267,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun showToast(context: Context, message: Int, duration: Int = Toast.LENGTH_SHORT) {
         Toast.makeText(context, message, duration).show()
+    }
+
+    private fun tedShowToast(message: String) {
+        Toast.makeText(TedPermissionProvider.context, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroy() {

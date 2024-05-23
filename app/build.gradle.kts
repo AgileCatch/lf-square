@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -61,9 +62,27 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    //WebView
+    // WebView
     implementation("androidx.webkit:webkit:1.11.0")
 
-    //Permission
+    // Permission
     implementation("io.github.ParkSangGwon:tedpermission-normal:3.3.0")
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation("com.google.firebase:firebase-inappmessaging-ktx")
+    implementation("com.google.firebase:firebase-inappmessaging-display-ktx")
+
+    // FCM
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation ("com.google.firebase:firebase-messaging-directboot:20.2.0")
+
+    // Firebase SDK for Google Analytics
+    implementation("com.google.firebase:firebase-analytics-ktx")
+
+    // TODO: Add the dependencies for any other Firebase products you want to use
+    // See https://firebase.google.com/docs/android/setup#available-libraries
+    // For example, add the dependencies for Firebase Authentication and Cloud Firestore
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
 }
