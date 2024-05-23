@@ -58,8 +58,6 @@ class MainActivity : AppCompatActivity() {
         }
         //btn 셋업
         setupButtons()
-        //bottom app bar 셋업
-//        setupScrollListener()
     }
 
 
@@ -107,10 +105,8 @@ class MainActivity : AppCompatActivity() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val token = task.result
-                // 여기서 token을 이용하여 작업을 수행할 수 있습니다.
-                // 예를 들어, 토스트 메시지로 토큰을 표시할 수 있습니다.
                 token?.let {
-                    tedShowToast("토큰: $it")
+//                    tedShowToast("토큰: $it")
                     Log.e(TAG, "토큰 값: $it")
 
                 }
@@ -192,57 +188,6 @@ class MainActivity : AppCompatActivity() {
 
         btnBarcode.setOnClickListener {
             showBarcodePopup()
-        }
-    }
-
-    //바텀 앱바 스크롤
-    private fun setupScrollListener() = with(binding) {
-
-        mainWebView.viewTreeObserver.addOnScrollChangedListener(object :
-            ViewTreeObserver.OnScrollChangedListener {
-            private var lastScrollY = 0
-            private var lastScrollDirection = 0 // 1: up, -1: down
-
-            override fun onScrollChanged() {
-                val currentScrollY = mainWebView.scrollY
-                val scrollDelta = currentScrollY - lastScrollY
-
-                if (scrollDelta > 0 && lastScrollDirection != -1) {
-                    lastScrollDirection = -1
-                    hideBottomAppBar()
-                } else if (scrollDelta < 0 && lastScrollDirection != 1) {
-                    lastScrollDirection = 1
-                    showBottomAppBar()
-                }
-
-                lastScrollY = currentScrollY
-            }
-        })
-    }
-
-    private fun hideBottomAppBar() = with(binding) {
-        apply {
-            bottomAppBar.animate()
-                .translationY(bottomAppBar.height.toFloat())
-                .setDuration(300)
-                .start()
-            btnBarcode.animate()
-                .translationY(bottomAppBar.height.toFloat())
-                .setDuration(300)
-                .start()
-        }
-    }
-
-    private fun showBottomAppBar() = with(binding) {
-        apply {
-            bottomAppBar.animate()
-                .translationY(0f)
-                .setDuration(300)
-                .start()
-            btnBarcode.animate()
-                .translationY(0f)
-                .setDuration(300)
-                .start()
         }
     }
 
